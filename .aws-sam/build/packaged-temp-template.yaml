@@ -1,0 +1,13 @@
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 300
+      MemorySize: 128
+      Handler: app.lambda_handler
+      CodeUri: s3://coms6156-dining-concierge-chatbot/23804dc02dcc10d9b4f7142df330aefb
+      Runtime: python3.9
+      Architectures:
+      - x86_64
+    Metadata:
+      SamResourceId: Function
