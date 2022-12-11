@@ -21,7 +21,7 @@ def welcome(intent_request):
     fulfillment_state = "Fulfilled"
     message = {
         'contentType': 'PlainText',
-        'content': 'Hey there! This is your private dining concierge here. How can I help you today?'
+        'content': 'This is your private dining concierge here. How can I help you today?'
     }
 
     return close(intent_request, session_attributes, fulfillment_state, message)
