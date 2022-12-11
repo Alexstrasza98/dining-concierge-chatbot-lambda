@@ -1,12 +1,16 @@
-def elicit_intent(intent_request, session_attributes, message):
+# To elicit another intent
+def elicit_intent(intent_request, session_attributes, fulfillment_state, message):
     return {
         'sessionState': {
+            'sessionAttributes': session_attributes,
             'dialogAction': {
-                'type': 'ElicitIntent'
+                'type': 'ElicitIntent',
+                'intentName': 'ViewSpecificRestaurant',
+                'slotToElicit': 'businessID'
             },
-            'sessionAttributes': session_attributes
         },
         'messages': [message] if message is not None else None,
+        'sessionId': intent_request['sessionId'],
         'requestAttributes': intent_request['requestAttributes'] if 'requestAttributes' in intent_request else None
     }
 
@@ -46,12 +50,3 @@ def close(intent_request, session_attributes, fulfillment_state, message, additi
     }
 
 
-# Directs Amazon Lex to choose the next course of action based on the bot configuration.
-def delegate(session_attributes, slots):
-    return {
-        'sessionAttributes': session_attributes,
-        'dialogAction': {
-            'type': 'Delegate',
-            'slots': slots
-        }
-    }

@@ -6,9 +6,8 @@ import time
 from dotenv import load_dotenv
 import requests
 
-from utils.action_types import close
+from utils.action_types import close, elicit_slot, elicit_intent
 from utils.validation import validate_dining_suggestion
-from utils.action_types import elicit_slot, delegate
 from utils.helpers import get_slot, get_session_attributes, mile_to_meter, price_to_dollar
 
 load_dotenv()
@@ -24,7 +23,7 @@ def welcome(intent_request):
         'content': 'This is your private dining concierge here. How can I help you today?'
     }
 
-    return close(intent_request, session_attributes, fulfillment_state, message)
+    return elicit_intent(intent_request, session_attributes, fulfillment_state, message)
 
 
 def initial_search_yelp(intent_request, context):
