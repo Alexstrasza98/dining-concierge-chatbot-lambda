@@ -2,14 +2,14 @@
 This sample demonstrates an implementation of the Lex Code Hook Interface
 in order to serve a sample bot which manages orders for flowers.
 Bot, Intent, and Slot models which are compatible with this sample can be found in the Lex Console
-as part of the 'OrderFlowers' template.
+as part of the "OrderFlowers" template.
 For instructions on how to set up and test this bot, as well as additional samples,
 visit the Lex Getting Started documentation http://docs.aws.amazon.com/lex/latest/dg/getting-started.html.
 """
 import time
 import os
 import logging
-from utils.intents import initial_search_yelp, view_specific_restaurant, welcome
+from utils.intents import initial_search_yelp, view_specific_restaurant, save_restaurant, reserve_restaurant, welcome
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -21,19 +21,23 @@ def dispatch(intent_request, context):
     """
 
     # logger.debug(
-    #     'dispatch userId={}, intentName={}'.format(intent_request['userId'], intent_request['currentIntent']['name']))
+    #     "dispatch userId={}, intentName={}".format(intent_request["userId"], intent_request["currentIntent"]["name"]))
 
     intent_name = intent_request["sessionState"]["intent"]["name"]
 
     # Dispatch to your chatbot intent handlers
-    if intent_name == 'SearchRestuarants':
+    if intent_name == "SearchRestuarants":
         return initial_search_yelp(intent_request, context)
-    elif intent_name == 'ViewSpecificRestaurant':
+    elif intent_name == "ViewSpecificRestaurant":
         return view_specific_restaurant(intent_request, context)
-    elif intent_name == 'Welcome':
+    elif intent_name == "SaveRestaurant":
+        return save_restaurant(intent_request, context)
+    elif intent_name == "ReserveRestaurant":
+        return reserve_restaurant(intent_request, context)
+    elif intent_name == "Welcome":
         return welcome(intent_request)
 
-    raise Exception('Intent with name ' + intent_name + ' not supported')
+    raise Exception("Intent with name " + intent_name + " not supported")
 
 
 """ --- Main handler --- """
@@ -45,9 +49,9 @@ def lambda_handler(event, context):
     The JSON body of the request is provided in the event slot.
     """
     # By default, treat the user request as coming from the America/New_York time zone.
-    os.environ['TZ'] = 'America/New_York'
+    os.environ["TZ"] = "America/New_York"
     time.tzset()
-    # logger.debug('event.bot.name={}'.format(event['bot']['name']))
+    # logger.debug("event.bot.name={}".format(event["bot"]["name"]))
 
     return dispatch(event, context)
 
