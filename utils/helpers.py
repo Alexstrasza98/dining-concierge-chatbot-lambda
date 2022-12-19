@@ -11,9 +11,16 @@ def get_slot(intent_request, slot_name):
 
 
 def get_session_attributes(intent_request):
-    sessionState = intent_request['sessionState']
-    if 'sessionAttributes' in sessionState:
-        return sessionState['sessionAttributes']
+    session_state = intent_request['sessionState']
+    if 'sessionAttributes' in session_state:
+        return session_state['sessionAttributes']
+
+    return {}
+
+
+def get_request_attributes(intent_request):
+    if 'sessionAttributes' in intent_request:
+        return intent_request['requestAttributes']
 
     return {}
 

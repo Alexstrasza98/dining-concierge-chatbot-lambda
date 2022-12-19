@@ -9,7 +9,7 @@ visit the Lex Getting Started documentation http://docs.aws.amazon.com/lex/lates
 import time
 import os
 import logging
-from utils.intents import initial_search_yelp, welcome
+from utils.intents import initial_search_yelp, view_specific_restaurant, welcome
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -28,6 +28,8 @@ def dispatch(intent_request, context):
     # Dispatch to your chatbot intent handlers
     if intent_name == 'SearchRestuarants':
         return initial_search_yelp(intent_request, context)
+    elif intent_name == 'ViewSpecificRestaurant':
+        return view_specific_restaurant(intent_request, context)
     elif intent_name == 'Welcome':
         return welcome(intent_request)
 

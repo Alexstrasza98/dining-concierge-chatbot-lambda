@@ -3,7 +3,7 @@ import json
 import pprint
 
 if __name__ == "__main__":
-    with open("../events/lex_sample.json") as f:
+    with open("../events/initial_search_success.json") as f:
         event = json.load(f)
 
     pprint.pprint(lambda_handler(event, None))

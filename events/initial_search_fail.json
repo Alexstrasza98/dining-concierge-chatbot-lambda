@@ -67,7 +67,7 @@
     "reservation": {
      "value": {
       "originalValue": "do",
-      "interpretedValue": "don",
+      "interpretedValue": "do",
       "resolvedValues": [
        "do"
       ]
