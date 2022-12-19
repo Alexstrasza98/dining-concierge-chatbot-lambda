@@ -174,7 +174,62 @@ def view_specific_restaurant(intent_request, context):
 
         messages = [{
             "contentType": "PlainText",
-            "content": "Finished Searching for Business with ID: " + business_id + " . Yes or No?"
+            "content": "Finished Searching for Business with ID: " + business_id
+        },
+        {
+            "contentType": "PlainText",
+            "content": "Current page should be a page about a specific restaurant. Do you like it or not?"
         }]
 
         return elicit_slot(session_attributes, intent, "save", messages, requests_attributes, session_id)
+
+
+def save_restaurant(intent_request, context):
+    save = get_slot(intent_request, "save")
+
+    if save == "yes":
+        # TODO: make post request to /usr/save, pass information about user and restaurant information
+
+        requests_attributes = get_request_attributes(intent_request)
+        session_attributes = get_session_attributes(intent_request)
+        session_id = intent_request["sessionId"]
+
+        intent = {
+            "confirmationState": "None",
+            "name": "ReserveRestaurant",
+            "slots": {
+                "reserve": None
+            },
+            "state": "InProgress"
+        }
+
+        messages = [{
+            "contentType": "PlainText",
+            "content": "You have saved this restaurant to your profile. Do you want to reserve it?"
+        }]
+
+        return elicit_slot(session_attributes, intent, "reserve", messages, requests_attributes, session_id)
+
+    elif save == "no":
+        # TODO: save initial search params in local instead of in session attributes, which may increase latency
+        session_attributes = get_session_attributes(intent_request)
+        original_request = json.loads(session_attributes["search_request"])
+        return initial_search_yelp(original_request, context)
+
+
+def reserve_restaurant(intent_request, context):
+    reserve = get_slot(intent_request, "reserve")
+    session_attributes = get_session_attributes(intent_request)
+    request_attributes = get_request_attributes(intent_request)
+    fulfillment_state = "Fulfilled"
+
+    if reserve == "yes":
+        # TODO: make post request to /usr/reserve, pass information about user and restaurant information
+        pass
+
+    messages = [{
+        "contentType": "PlainText",
+        "content": "You have finished the journey with dining concierge chatbot. Wish you a good meal!"
+    }]
+
+    return close(intent_request, session_attributes, fulfillment_state, messages, request_attributes)
