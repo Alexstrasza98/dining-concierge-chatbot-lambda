@@ -1,26 +1,24 @@
 {
+ "messages": [
+  {
+   "content": "You are going to search chinese restaurants for 3 people around NYC in 10 miles. You want to have food for now and expect the cost per person around 20$. You do need help with reservation. Is that correct?",
+   "contentType": "PlainText"
+  }
+ ],
  "sessionState": {
   "dialogAction": {
-   "type": "Close"
+   "type": "ConfirmIntent"
   },
   "intent": {
    "name": "SearchRestuarants",
    "slots": {
-    "date": {
-     "value": {
-      "originalValue": "today",
-      "interpretedValue": "2022-12-09",
-      "resolvedValues": [
-       "2022-12-09"
-      ]
-     }
-    },
+    "date": null,
     "eat_now": {
      "value": {
-      "originalValue": "later",
-      "interpretedValue": "later",
+      "originalValue": "now",
+      "interpretedValue": "now",
       "resolvedValues": [
-       "later"
+       "now"
       ]
      }
     },
@@ -51,10 +49,10 @@
     },
     "radius": {
      "value": {
-      "originalValue": "1",
-      "interpretedValue": "1",
+      "originalValue": "10",
+      "interpretedValue": "10",
       "resolvedValues": [
-       "1"
+       "10"
       ]
      }
     },
@@ -74,45 +72,26 @@
       "resolvedValues": []
      }
     },
-    "time": {
-     "value": {
-      "originalValue": "12 pm",
-      "interpretedValue": "12:00",
-      "resolvedValues": [
-       "12:00"
-      ]
-     }
-    }
+    "time": null
    },
-   "state": "Failed",
-   "confirmationState": "Confirmed"
+   "state": "InProgress",
+   "confirmationState": "None"
   },
   "sessionAttributes": {},
-  "originatingRequestId": "8f0b076a-d138-4cb7-a122-36e0a1d8d923"
+  "originatingRequestId": "89cea5bb-b370-4657-9274-3f8139c1bb64"
  },
  "interpretations": [
   {
-   "nluConfidence": {
-    "score": 1
-   },
    "intent": {
     "name": "SearchRestuarants",
     "slots": {
-     "date": {
-      "value": {
-       "originalValue": "today",
-       "interpretedValue": "2022-12-09",
-       "resolvedValues": [
-        "2022-12-09"
-       ]
-      }
-     },
+     "date": null,
      "eat_now": {
       "value": {
-       "originalValue": "later",
-       "interpretedValue": "later",
+       "originalValue": "now",
+       "interpretedValue": "now",
        "resolvedValues": [
-        "later"
+        "now"
        ]
       }
      },
@@ -143,19 +122,19 @@
      },
      "radius": {
       "value": {
-       "originalValue": "1",
-       "interpretedValue": "1",
+       "originalValue": "10",
+       "interpretedValue": "10",
        "resolvedValues": [
-        "1"
+        "10"
        ]
       }
      },
      "reservation": {
       "value": {
-       "originalValue": "yes",
-       "interpretedValue": "yes",
+       "originalValue": "do",
+       "interpretedValue": "do",
        "resolvedValues": [
-        "yes"
+        "do"
        ]
       }
      },
@@ -166,18 +145,10 @@
        "resolvedValues": []
       }
      },
-     "time": {
-      "value": {
-       "originalValue": "12 pm",
-       "interpretedValue": "12:00",
-       "resolvedValues": [
-        "12:00"
-       ]
-      }
-     }
+     "time": null
     },
-    "state": "Failed",
-    "confirmationState": "Confirmed"
+    "state": "InProgress",
+    "confirmationState": "None"
    }
   },
   {
@@ -185,7 +156,16 @@
     "name": "FallbackIntent",
     "slots": {}
    }
+  },
+  {
+   "nluConfidence": {
+    "score": 0.09
+   },
+   "intent": {
+    "name": "Welcome",
+    "slots": {}
+   }
   }
  ],
- "sessionId": "384476884672628"
+ "sessionId": "384476884672270"
 }
