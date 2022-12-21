@@ -142,7 +142,7 @@ def view_specific_restaurant(intent_request, context):
 
     # if user not interested:
     if business_id == "no":
-        # TODO: save initial search params in local instead of in session attributes, which may increase latency
+        # TODO: save initial search params in client instead of in session attributes, which may increase latency
         session_attributes = get_session_attributes(intent_request)
         original_request = json.loads(session_attributes["search_request"])
         original_request["sessionState"]["sessionAttributes"]["offset"] += 6

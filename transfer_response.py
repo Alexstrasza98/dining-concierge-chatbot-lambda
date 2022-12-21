@@ -27,9 +27,9 @@ def lambda_handler(event, context):
         texts = []
         for message in messages:
             if message["contentType"] == "PlainText":
-                texts.append(message["content"])
+                texts.append(("PlainText", message["content"]))
             elif message["contentType"] == "ImageResponseCard":
-                texts.append(message["imageResponseCard"]["subtitle"])
+                texts.append(("ImageResponseCard", message["imageResponseCard"]))
             else:
                 return response_404("Error: Unrecognizable content type.")
 
@@ -61,8 +61,9 @@ def response_200(texts, session_id, session_state, request_attributes):
             {
                 "type": "unstructured",
                 "unstructured": {
+                    "contentType": text[0], # Message content type: one of [PlainText, ImageResponseCard]
                     "uid": session_id,
-                    "text": text,
+                    "text": text[1], # Message content
                     "time": time.time()
                 }
             } for text in texts],
