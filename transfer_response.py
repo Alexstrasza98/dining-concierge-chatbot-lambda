@@ -17,7 +17,7 @@ def lambda_handler(event, context):
         return response_404("Error: Failed to get text from request.")
 
     # get chatbot response
-    messages = get_chatbot_response(text, session_id)
+    messages, session_state, request_attributes = get_chatbot_response(text, session_id)
 
     # error handler: if no response from lex
     if messages is None:
@@ -33,7 +33,7 @@ def lambda_handler(event, context):
             else:
                 return response_404("Error: Unrecognizable content type.")
 
-        return response_200(texts, session_id)
+        return response_200(texts, session_id, session_state, request_attributes)
 
 
 # To get text from request (Only accept text as input)
@@ -54,7 +54,7 @@ def get_request(event):
 
 
 # successful response (200)
-def response_200(texts, session_id):
+def response_200(texts, session_id, session_state, request_attributes):
     res = {
         "status code": 200,
         "messages": [
@@ -66,6 +66,8 @@ def response_200(texts, session_id):
                     "time": time.time()
                 }
             } for text in texts],
+        "sessionState": session_state,
+        "requestAttributes": request_attributes,
         "headers": {
             "Access-Control-Allow-Origin": "*"
         }
@@ -83,16 +85,21 @@ def response_404(message):
 
 
 # call lex api to get response
-def get_chatbot_response(text, session_id):
+def get_chatbot_response(text, session_id, session_state=None):
     client = boto3.client('lexv2-runtime')
+
+    params = {
+        "botId": "POZUK7GBOG",
+        "botAliasId": "ERWBY10NNS",
+        "localeId": "en_US",
+        "sessionId": session_id,
+        "text": text
+    }
+
+    if session_state is not None:
+        params["sessionState"] = session_state
     # pass message to Lex
-    lex_response = client.recognize_text(
-        botId='POZUK7GBOG',
-        botAliasId='ERWBY10NNS',
-        localeId='en_US',
-        sessionId=session_id,
-        text=text
-    )
+    lex_response = client.recognize_text(**params)
 
     if not isinstance(lex_response, dict):
         return None
@@ -101,4 +108,4 @@ def get_chatbot_response(text, session_id):
         return None
 
     # get response from Lex
-    return lex_response['messages']
+    return lex_response['messages'], lex_response.get("sessionState"), lex_response.get("requestAttributes")
