@@ -80,10 +80,16 @@ def initial_search_yelp(intent_request, context):
 
     # if found any restaurant, go to next step
     if nums > 0:
-        messages = [{
-            "contentType": "PlainText",
-            "content": "I have found " + str(all_businesses["total"]) + " restaurants for you! Current offset: " + str(params["offset"])
-        }]
+        if session_attributes["offset"] == 0:
+            messages = [{
+                "contentType": "PlainText",
+                "content": "I have found " + str(all_businesses["total"]) + " restaurants ! Here displayed first 6 for you. You can click on 'More Restaurants' to view more."
+            }]
+        else:
+            messages = [{
+                "contentType": "PlainText",
+                "content": "Here are another 6 restaurants."
+            }]
 
         intent = {
             "confirmationState": "None",
