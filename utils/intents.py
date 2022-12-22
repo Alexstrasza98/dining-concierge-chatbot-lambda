@@ -83,7 +83,7 @@ def initial_search_yelp(intent_request, context):
         if session_attributes["offset"] == 0:
             messages = [{
                 "contentType": "PlainText",
-                "content": "I have found " + str(all_businesses["total"]) + " restaurants ! Here displayed first 6 for you. You can click on 'More Restaurants' to view more."
+                "content": "I have found " + str(all_businesses["total"]) + " restaurants! Here displayed first 6 for you. You can click on 'More Restaurants' to view more."
             }]
         else:
             messages = [{
@@ -178,14 +178,20 @@ def view_specific_restaurant(intent_request, context):
             "state": "InProgress"
         }
 
-        messages = [{
-            "contentType": "PlainText",
-            "content": "Finished Searching for Business with ID: " + business_id
-        },
-        {
-            "contentType": "PlainText",
-            "content": "Current page should be a page about a specific restaurant. Do you like it or not?"
-        }]
+        if "error" in business_info:
+            messages = [{
+                "contentType": "PlainText",
+                "content": "Can't find this business, visited url:" + (os.getenv("YELP_BUSINESS_URL") + business_id)
+            }]
+        else:
+            messages = [{
+                "contentType": "PlainText",
+                "content": "Finished Searching for Business with ID: " + business_id
+            },
+            {
+                "contentType": "PlainText",
+                "content": "Current page should be a page about a specific restaurant. Do you like it or not?"
+            }]
 
         return elicit_slot(session_attributes, intent, "save", messages, requests_attributes, session_id)
 
