@@ -68,6 +68,9 @@ def initial_search_yelp(intent_request, context):
         params["reservation_date"] = search_date
         params["reservation_time"] = search_time
         params["reservation_covers"] = int(people)
+        dt = datetime.strptime(search_date + "," + search_time, "%Y-%m-%d,%H:%M")
+        session_attributes["reservation_date"] = dt
+        session_attributes["people"] = people
 
     # call yelp api and get answer
     response = requests.get(url=os.getenv("YELP_URL"), params=params, headers=HEADERS)
@@ -167,6 +170,8 @@ def view_specific_restaurant(intent_request, context):
         requests_attributes["business_info"] = json.dumps(business_info)
         requests_attributes["reviews_info"] = json.dumps(reviews_info)
         session_attributes = get_session_attributes(intent_request)
+        session_attributes["business_info"] = json.dumps(business_info)
+        session_attributes["reviews_info"] = json.dumps(reviews_info)
         session_id = intent_request["sessionId"]
 
         intent = {
@@ -200,7 +205,43 @@ def save_restaurant(intent_request, context):
     save = get_slot(intent_request, "save")
 
     if save == "yes":
-        # TODO: make post request to /usr/save, pass information about user and restaurant information
+
+        session_attributes = get_session_attributes(intent_request)
+        # requests_attributes = get_request_attributes(intent_request)
+        business_info = session_attributes["business_info"]
+        # business_info =business_info.json()
+        reviews_info = session_attributes["reviews_info"]
+
+        # TODO: change format of database info
+        business_info = business_info
+        # reviews_info = reviews_info
+        location = ""
+        for i in business_info["location"]["display_address"]:
+            location = location + i + " "
+        business_data = {'businessId': business_info["id"],
+                         'name': business_info["name"],
+                         'rate': business_info["rating"],
+                         'location': location,
+                         'price': business_info["price"],
+                         'image_url': business_info["image_url"],
+                         'yelp_url': business_info["url"]
+                         }
+
+        session_id = intent_request["sessionId"]
+
+        API_ENDPOINT = "http://44.206.254.99:8080/save"
+
+
+
+        # sending post request and saving response as response object
+        r = requests.post(url=API_ENDPOINT, json=business_data)
+
+        # for test
+        # return business_data, r.json()
+        # extracting response text
+        pastebin_url = r.text
+        print("The pastebin URL is:%s" % pastebin_url)
+
 
         requests_attributes = get_request_attributes(intent_request)
         session_attributes = get_session_attributes(intent_request)
@@ -231,13 +272,39 @@ def save_restaurant(intent_request, context):
 
 def reserve_restaurant(intent_request, context):
     reserve = get_slot(intent_request, "reserve")
+    # reserve = "yes"
     session_attributes = get_session_attributes(intent_request)
     request_attributes = get_request_attributes(intent_request)
     fulfillment_state = "Fulfilled"
 
     if reserve == "yes":
-        # TODO: make post request to /usr/reserve, pass information about user and restaurant information
-        pass
+        business_info = session_attributes["business_info"]
+        reviews_info = session_attributes["reviews_info"]
+
+        # TODO: change format of database info
+        business_info = business_info
+        # reviews_info = reviews_info
+        location = ""
+        for i in business_info["location"]["display_address"]:
+            location = location + i + " "
+        business_data = {'businessId': business_info["id"],
+                         'name': business_info["name"],
+                         'location': location,
+                         'image_url': business_info["image_url"],
+                         'yelp_url': business_info["url"],
+
+                         'people': session_attributes["people"],
+                         'dt': session_attributes["reservation_date"].isoformat()
+                         # 'dt': session_attributes["reservation_date"]
+                         }
+
+        session_id = intent_request["sessionId"]
+
+        API_ENDPOINT = "http://44.206.254.99:8080/reserve"
+
+        # sending post request and saving response as response object
+        r = requests.post(url=API_ENDPOINT, json=business_data)
+        # return business_data, r.json()
 
     messages = [{
         "contentType": "PlainText",
