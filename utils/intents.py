@@ -29,25 +29,31 @@ def initial_search_yelp(intent_request, context):
 
     # use session attributes to store
     session_attributes = get_session_attributes(intent_request)
+
     if "offset" not in session_attributes:
         session_attributes["offset"] = 0
 
     # fetch slots
     location = get_slot(intent_request, "location")
     eat_now = get_slot(intent_request, "eat_now")
+
     if eat_now == "now":
-        now = datetime.now()
-        search_date = now.strftime("%Y-%m-%d")
-        search_time = now.strftime("%H:%M")
+        dt = datetime.now()
+        search_date = dt.strftime("%Y-%m-%d")
+        search_time = dt.strftime("%H:%M")
     else:
         search_date = get_slot(intent_request, "date")
         search_time = get_slot(intent_request, "time")
+        dt = datetime.strptime(search_date + "," + search_time, "%Y-%m-%d,%H:%M")
+
     term = get_slot(intent_request, "term")
     people = get_slot(intent_request, "people")
     radius = get_slot(intent_request, "radius")
     price = get_slot(intent_request, "price")
     reserve = get_slot(intent_request, "reservation")
 
+    session_attributes["reservation_date"] = dt.isoformat()
+    session_attributes["people"] = people
     # set request parameters
     params = {
         "location": location,
@@ -61,16 +67,14 @@ def initial_search_yelp(intent_request, context):
     if eat_now == "now":
         params["open_now"] = True
     else:
-        dt = datetime.strptime(search_date + "," + search_time, "%Y-%m-%d,%H:%M")
         params["open_at"] = int(time.mktime(dt.timetuple()))
 
     if reserve == "do":
         params["reservation_date"] = search_date
         params["reservation_time"] = search_time
         params["reservation_covers"] = int(people)
-        dt = datetime.strptime(search_date + "," + search_time, "%Y-%m-%d,%H:%M")
-        session_attributes["reservation_date"] = dt
-        session_attributes["people"] = people
+
+
 
     # call yelp api and get answer
     response = requests.get(url=os.getenv("YELP_URL"), params=params, headers=HEADERS)
@@ -191,11 +195,7 @@ def view_specific_restaurant(intent_request, context):
         else:
             messages = [{
                 "contentType": "PlainText",
-                "content": "Finished Searching for Business with ID: " + business_id
-            },
-            {
-                "contentType": "PlainText",
-                "content": "Current page should be a page about a specific restaurant. Do you like it or not?"
+                "content": "Here are more information about restaurant: " + business_info["name"] + ". Please decide if you want to have food there!"
             }]
 
         return elicit_slot(session_attributes, intent, "save", messages, requests_attributes, session_id)
@@ -208,13 +208,11 @@ def save_restaurant(intent_request, context):
 
         session_attributes = get_session_attributes(intent_request)
         # requests_attributes = get_request_attributes(intent_request)
-        business_info = session_attributes["business_info"]
-        # business_info =business_info.json()
-        reviews_info = session_attributes["reviews_info"]
+        business_info = json.loads(session_attributes["business_info"])
 
         # TODO: change format of database info
         business_info = business_info
-        # reviews_info = reviews_info
+
         location = ""
         for i in business_info["location"]["display_address"]:
             location = location + i + " "
@@ -227,20 +225,9 @@ def save_restaurant(intent_request, context):
                          'yelp_url': business_info["url"]
                          }
 
-        session_id = intent_request["sessionId"]
-
         API_ENDPOINT = "http://44.206.254.99:8080/save"
-
-
-
         # sending post request and saving response as response object
         r = requests.post(url=API_ENDPOINT, json=business_data)
-
-        # for test
-        # return business_data, r.json()
-        # extracting response text
-        pastebin_url = r.text
-        print("The pastebin URL is:%s" % pastebin_url)
 
 
         requests_attributes = get_request_attributes(intent_request)
@@ -272,18 +259,18 @@ def save_restaurant(intent_request, context):
 
 def reserve_restaurant(intent_request, context):
     reserve = get_slot(intent_request, "reserve")
-    # reserve = "yes"
     session_attributes = get_session_attributes(intent_request)
     request_attributes = get_request_attributes(intent_request)
     fulfillment_state = "Fulfilled"
 
+    messages = []
+
     if reserve == "yes":
         business_info = session_attributes["business_info"]
-        reviews_info = session_attributes["reviews_info"]
 
         # TODO: change format of database info
-        business_info = business_info
-        # reviews_info = reviews_info
+        business_info = json.loads(business_info)
+
         location = ""
         for i in business_info["location"]["display_address"]:
             location = location + i + " "
@@ -294,8 +281,7 @@ def reserve_restaurant(intent_request, context):
                          'yelp_url': business_info["url"],
 
                          'people': session_attributes["people"],
-                         'dt': session_attributes["reservation_date"].isoformat()
-                         # 'dt': session_attributes["reservation_date"]
+                         'dt': session_attributes["reservation_date"]
                          }
 
         session_id = intent_request["sessionId"]
@@ -304,11 +290,18 @@ def reserve_restaurant(intent_request, context):
 
         # sending post request and saving response as response object
         r = requests.post(url=API_ENDPOINT, json=business_data)
-        # return business_data, r.json()
 
-    messages = [{
+        dt = datetime.fromisoformat(session_attributes["reservation_date"]).strftime("%Y-%m-%d at %H:%M")
+
+
+        messages.append({
+        "contentType": "PlainText",
+        "content": f"You have reserved this restaurant for " + session_attributes["people"] + " people on " + dt + "."
+    })
+
+    messages.append({
         "contentType": "PlainText",
         "content": "You have finished the journey with dining concierge chatbot. Wish you a good meal!"
-    }]
+    })
 
     return close(intent_request, session_attributes, fulfillment_state, messages, request_attributes)
